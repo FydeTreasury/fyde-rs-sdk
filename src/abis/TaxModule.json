@@ -1,0 +1,603 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_fyde",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "AssetPriceNotAvailable",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "MaxFlatTaxExceeded",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowInt256ToUint256",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowUint256ToInt256",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "Unauthorized",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "pendingOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferCanceled",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferStarted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "FYDE",
+        "outputs": [
+            {
+                "internalType": "contract IFyde",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "acceptOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "cancelTransferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "flatTaxRateDeposit",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "flatTaxRateSwap",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "flatTaxRateWithdraw",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint32",
+                        "name": "id",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "requestor",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address[]",
+                        "name": "assetIn",
+                        "type": "address[]"
+                    },
+                    {
+                        "internalType": "uint256[]",
+                        "name": "amountIn",
+                        "type": "uint256[]"
+                    },
+                    {
+                        "internalType": "address[]",
+                        "name": "assetOut",
+                        "type": "address[]"
+                    },
+                    {
+                        "internalType": "uint256[]",
+                        "name": "amountOut",
+                        "type": "uint256[]"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "keepGovRights",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "slippageChecker",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct RequestData",
+                "name": "_req",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_protocolAUM",
+                "type": "uint256"
+            }
+        ],
+        "name": "getProcessParamDeposit",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "targetConc",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "currentConc",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "usdValue",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "taxableAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "taxInUSD",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sharesBeforeTax",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sharesAfterTax",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct ProcessParam[]",
+                "name": "processParam",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "sharesToMint",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "taxInTRSY",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "totalUsdDeposit",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint32",
+                        "name": "id",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "requestor",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address[]",
+                        "name": "assetIn",
+                        "type": "address[]"
+                    },
+                    {
+                        "internalType": "uint256[]",
+                        "name": "amountIn",
+                        "type": "uint256[]"
+                    },
+                    {
+                        "internalType": "address[]",
+                        "name": "assetOut",
+                        "type": "address[]"
+                    },
+                    {
+                        "internalType": "uint256[]",
+                        "name": "amountOut",
+                        "type": "uint256[]"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "keepGovRights",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "slippageChecker",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct RequestData",
+                "name": "_req",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_protocolAUM",
+                "type": "uint256"
+            }
+        ],
+        "name": "getProcessParamWithdraw",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "targetConc",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "currentConc",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "usdValue",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "taxableAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "taxInUSD",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sharesBeforeTax",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sharesAfterTax",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct ProcessParam[]",
+                "name": "processParam",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "totalSharesToBurn",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "sharesToBurnBeforeTax",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "taxInTRSY",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "totalUsdWithdraw",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_assetIn",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amountIn",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_assetOut",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_protocolAUM",
+                "type": "uint256"
+            }
+        ],
+        "name": "getSwapAmountOut",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "int256",
+                "name": "",
+                "type": "int256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pendingOwner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint32",
+                "name": "_deposit",
+                "type": "uint32"
+            },
+            {
+                "internalType": "uint32",
+                "name": "_withdraw",
+                "type": "uint32"
+            },
+            {
+                "internalType": "uint32",
+                "name": "_swap",
+                "type": "uint32"
+            }
+        ],
+        "name": "setFlatTaxRate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint32",
+                "name": "_taxfactor",
+                "type": "uint32"
+            }
+        ],
+        "name": "setTaxFactorDeposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint32",
+                "name": "_taxfactor",
+                "type": "uint32"
+            }
+        ],
+        "name": "setTaxFactorWithdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "_assets",
+                "type": "address[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint128",
+                        "name": "targetConcDeposit",
+                        "type": "uint128"
+                    },
+                    {
+                        "internalType": "uint128",
+                        "name": "targetConcWithdraw",
+                        "type": "uint128"
+                    }
+                ],
+                "internalType": "struct TaxParams[]",
+                "name": "_taxParams",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "setTaxParams",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "taxFactorDeposit",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "taxFactorWithdraw",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "taxParams",
+        "outputs": [
+            {
+                "internalType": "uint128",
+                "name": "targetConcDeposit",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "targetConcWithdraw",
+                "type": "uint128"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

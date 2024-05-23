@@ -1,0 +1,723 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_feedRegistry",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_gasFeed",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowInt256ToUint256",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowInt56ToInt24",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowUint256ToInt256",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowUint256ToUint128",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OverflowUint56ToInt56",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PriceOutsideBounds",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "T",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "Unauthorized",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "pendingOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferCanceled",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferStarted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "USD",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "acceptOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_keeper",
+                "type": "address"
+            }
+        ],
+        "name": "addPriceKeeper",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "cache",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "cancelTransferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "clRegistry",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "deviationThreshold",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "disableCache",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "gasFeed",
+        "outputs": [
+            {
+                "internalType": "contract AggregatorInterface",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getGweiPrice",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "assetAddress",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint72",
+                        "name": "targetConcentration",
+                        "type": "uint72"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "uniswapPool",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "int72",
+                        "name": "incentiveFactor",
+                        "type": "int72"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "assetDecimals",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "quoteTokenDecimals",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "uniswapQuoteToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isSupported",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct AssetInfo",
+                "name": "assetInfo",
+                "type": "tuple"
+            }
+        ],
+        "name": "getPriceInUSD",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "isPriceKeeper",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "manualGweiPrice",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "manualPrice",
+        "outputs": [
+            {
+                "internalType": "uint128",
+                "name": "price",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "validUntil",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "minPrice",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "maxPrice",
+                "type": "uint128"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pendingOwner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "relayer",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_keeper",
+                "type": "address"
+            }
+        ],
+        "name": "removePriceKeeper",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "feedRegistry",
+                "type": "address"
+            }
+        ],
+        "name": "setChainlinkFeedRegistry",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "_deviationThreshold",
+                "type": "uint16"
+            }
+        ],
+        "name": "setDeviationThreshold",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_gasFeed",
+                "type": "address"
+            }
+        ],
+        "name": "setGasFeedAddress",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_gweiPrice",
+                "type": "uint256"
+            }
+        ],
+        "name": "setManualGweiPrice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "internalType": "uint128",
+                "name": "_price",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "_validity",
+                "type": "uint128"
+            }
+        ],
+        "name": "setManualPrice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "internalType": "uint128",
+                "name": "_minPrice",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "_maxPrice",
+                "type": "uint128"
+            }
+        ],
+        "name": "setManualPriceBounds",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "internalType": "uint128",
+                "name": "_price",
+                "type": "uint128"
+            },
+            {
+                "internalType": "uint128",
+                "name": "_validity",
+                "type": "uint128"
+            }
+        ],
+        "name": "setManualPriceOwner",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_relayer",
+                "type": "address"
+            }
+        ],
+        "name": "setRelayer",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint32",
+                "name": "_stalePeriod",
+                "type": "uint32"
+            }
+        ],
+        "name": "setStalePeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "_twapPeriodLong",
+                "type": "uint16"
+            }
+        ],
+        "name": "setTwapPeriodLong",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "_twapPeriodShort",
+                "type": "uint16"
+            }
+        ],
+        "name": "setTwapPeriodShort",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "asset",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_useChainlinkEthPair",
+                "type": "bool"
+            }
+        ],
+        "name": "setUseChainlinkEthPair",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "stalePeriod",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "twapPeriodLong",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "twapPeriodShort",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "addr",
+                "type": "address[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint72",
+                        "name": "targetConcentration",
+                        "type": "uint72"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "uniswapPool",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "int72",
+                        "name": "incentiveFactor",
+                        "type": "int72"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "assetDecimals",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "quoteTokenDecimals",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "uniswapQuoteToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isSupported",
+                        "type": "bool"
+                    }
+                ],
+                "internalType": "struct AssetInfo[]",
+                "name": "assetInfo",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "useCache",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "useChainlinkEthPair",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
