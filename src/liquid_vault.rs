@@ -76,6 +76,11 @@ impl LiquidVault {
         Ok(fees)
     }
 
+    pub async fn get_tax_fees(&self) -> Result<U256, FydeError> {
+        let tax_fees = self.get_total_fees().await? - self.get_management_fees().await?;
+        Ok(tax_fees)
+    }
+
     pub async fn get_burned_trsy_by_swap(&self) -> Result<U256, FydeError> {
         let mut burned = U256::from(0);
         for event in self.events.iter() {
