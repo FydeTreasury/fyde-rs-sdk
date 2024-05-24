@@ -1,4 +1,6 @@
-use crate::{errors::FydeError, AddressList, LiquidVaultContract, LiquidVaultContractEvents};
+use crate::{
+    errors::FydeError, AddressList, LiquidVaultContract, LiquidVaultContractEvents, StakingTRSY,
+};
 use ethers::{
     contract::Multicall,
     providers::{Http, Provider},
@@ -8,6 +10,7 @@ use std::sync::Arc;
 
 pub struct LiquidVault {
     contract: LiquidVaultContract<Provider<Http>>,
+    staking_trsy: StakingTRSY<Provider<Http>>,
     multicall: Multicall<Provider<Http>>,
     events: Vec<LiquidVaultContractEvents>,
     address: Address,
@@ -16,6 +19,7 @@ pub struct LiquidVault {
 impl LiquidVault {
     pub async fn new(provider: Arc<Provider<Http>>, address_list: AddressList) -> Self {
         let contract = LiquidVaultContract::new(address_list.liquid_vault, provider.clone());
+        let staking_trsy = StakingTRSY::new(address_list.staking_trsy, provider.clone());
         let multicall = Multicall::new(provider, None)
             .await
             .expect("Failed to create Multicall");
@@ -27,6 +31,7 @@ impl LiquidVault {
             .expect("Failed to get events");
         Self {
             contract,
+            staking_trsy,
             multicall,
             address: address_list.liquid_vault,
             events,
@@ -39,6 +44,10 @@ impl LiquidVault {
 
     pub async fn get_trsy_supply(&self) -> Result<U256, FydeError> {
         Ok(self.contract.total_supply().call().await?)
+    }
+
+    pub async fn get_trsy_staked(&self) -> Result<U256, FydeError> {
+        Ok(self.staking_trsy.total_supply().call().await?)
     }
 
     pub async fn get_trsy_value(&self) -> Result<U256, FydeError> {

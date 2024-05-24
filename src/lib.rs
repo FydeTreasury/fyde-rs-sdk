@@ -13,6 +13,7 @@ abigen!(TaxModuleContract, "./src/abis/TaxModule.json");
 abigen!(GovernanceModuleContract, "./src/abis/GovernanceModule.json");
 abigen!(OracleModuleContract, "./src/abis/OracleModule.json");
 abigen!(RelayerContract, "./src/abis/RelayerV2.json");
+abigen!(StakingTRSY, "./src/abis/stakingTRSY.json");
 
 abigen!(
     ERC20,
