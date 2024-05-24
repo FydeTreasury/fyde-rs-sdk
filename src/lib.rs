@@ -44,12 +44,14 @@ pub enum Chain {
     Sepolia,
 }
 
-impl From<String> for Chain {
-    fn from(chain: &str) -> Self {
-        match chain {
-            "Mainnet" => Self::Mainnet,
-            "Sepolia" => Self::Sepolia,
-            _ => panic!("Invalid chain"),
+impl std::str::FromStr for Chain {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Mainnet" => Ok(Chain::Mainnet),
+            "Sepolia" => Ok(Chain::Sepolia),
+            _ => Err(()),
         }
     }
 }
