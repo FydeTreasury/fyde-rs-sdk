@@ -9,6 +9,7 @@ use std::sync::Arc;
 pub struct LiquidVault {
     contract: LiquidVaultContract<Provider<Http>>,
     multicall: Multicall<Provider<Http>>,
+    events: Vec<LiquidVaultContractEvents>,
     address: Address,
 }
 
@@ -18,10 +19,17 @@ impl LiquidVault {
         let multicall = Multicall::new(provider, None)
             .await
             .expect("Failed to create Multicall");
+        let events = contract
+            .events()
+            .from_block(0)
+            .query()
+            .await
+            .expect("Failed to get events");
         Self {
             contract,
             multicall,
             address: address_list.liquid_vault,
+            events,
         }
     }
 
@@ -39,12 +47,9 @@ impl LiquidVault {
         Ok(tvl / trsy_supply)
     }
 
-    pub async fn get_total_fees(
-        &self,
-        events: &[LiquidVaultContractEvents],
-    ) -> Result<U256, FydeError> {
+    pub async fn get_total_fees(&self) -> Result<U256, FydeError> {
         let mut tax = U256::from(0);
-        for event in events {
+        for event in self.events.iter() {
             if let LiquidVaultContractEvents::TransferFilter(ev) = event {
                 if ev.from
                     == "0x0000000000000000000000000000000000000000"
@@ -59,12 +64,10 @@ impl LiquidVault {
         Ok(tax)
     }
 
-    pub async fn get_management_fees(
-        events: &[LiquidVaultContractEvents],
-    ) -> Result<U256, FydeError> {
+    pub async fn get_management_fees(&self) -> Result<U256, FydeError> {
         let mut fees = U256::from(0);
 
-        for event in events {
+        for event in self.events.iter() {
             if let LiquidVaultContractEvents::ManagementFeeCollectedFilter(ev) = event {
                 fees += ev.fee_to_mint;
             }
@@ -73,12 +76,9 @@ impl LiquidVault {
         Ok(fees)
     }
 
-    pub async fn get_burned_trsy_by_swap(
-        &self,
-        events: &[LiquidVaultContractEvents],
-    ) -> Result<U256, FydeError> {
+    pub async fn get_burned_trsy_by_swap(&self) -> Result<U256, FydeError> {
         let mut burned = U256::from(0);
-        for event in events {
+        for event in self.events.iter() {
             if let LiquidVaultContractEvents::TransferFilter(ev) = event {
                 if ev.to
                     == "0x0000000000000000000000000000000000000000"
