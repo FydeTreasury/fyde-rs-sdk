@@ -44,6 +44,16 @@ pub enum Chain {
     Sepolia,
 }
 
+impl From<String> for Chain {
+    fn from(chain: &str) -> Self {
+        match chain {
+            "Mainnet" => Self::Mainnet,
+            "Sepolia" => Self::Sepolia,
+            _ => panic!("Invalid chain"),
+        }
+    }
+}
+
 impl AddressList {
     pub fn new(chain: &Chain) -> Self {
         match chain {
