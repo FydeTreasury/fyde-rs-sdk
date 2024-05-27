@@ -88,7 +88,14 @@ impl Asset {
 #[async_trait]
 impl AssetTrait for Asset {
     async fn get_symbol(&self) -> Result<String, FydeError> {
-        Ok(self.contract.symbol().call().await?)
+        let mkr_address: Address = String::from("0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2")
+            .parse()
+            .expect("Failed to create address");
+        let symbol = match self.asset_address == mkr_address {
+            true => String::from("MKR"),
+            false => self.contract.symbol().call().await?,
+        };
+        Ok(symbol)
     }
 
     async fn get_decimals(&self) -> Result<u8, FydeError> {
