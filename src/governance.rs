@@ -5,7 +5,7 @@ use ethers::{
 };
 use std::sync::Arc;
 
-use crate::{errors::FydeError, AddressList, GovernanceModuleContract};
+use crate::{errors::FydeError, AddressList, Chain, GovernanceModuleContract};
 
 pub struct Governance {
     governance_module: GovernanceModuleContract<Provider<Http>>,
@@ -13,7 +13,9 @@ pub struct Governance {
 }
 
 impl Governance {
-    pub async fn new(provider: Arc<Provider<Http>>, address_list: AddressList) -> Self {
+    pub async fn new(provider: Arc<Provider<Http>>, chain: Chain) -> Self {
+        let address_list: AddressList = AddressList::new(&chain);
+
         let governance_module =
             GovernanceModuleContract::new(address_list.governance_module, provider.clone());
         let multicall = Multicall::new(provider, None)

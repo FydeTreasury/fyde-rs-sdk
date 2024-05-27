@@ -1,5 +1,6 @@
 use crate::{
-    errors::FydeError, AddressList, LiquidVaultContract, LiquidVaultContractEvents, StakingTRSY,
+    errors::FydeError, AddressList, Chain, LiquidVaultContract, LiquidVaultContractEvents,
+    StakingTRSY,
 };
 use ethers::{
     contract::Multicall,
@@ -17,7 +18,8 @@ pub struct LiquidVault {
 }
 
 impl LiquidVault {
-    pub async fn new(provider: Arc<Provider<Http>>, address_list: AddressList) -> Self {
+    pub async fn new(provider: Arc<Provider<Http>>, chain: Chain) -> Self {
+        let address_list: AddressList = AddressList::new(&chain);
         let contract = LiquidVaultContract::new(address_list.liquid_vault, provider.clone());
         let staking_trsy = StakingTRSY::new(address_list.staking_trsy, provider.clone());
         let multicall = Multicall::new(provider, None)

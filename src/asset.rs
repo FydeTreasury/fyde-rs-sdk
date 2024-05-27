@@ -7,8 +7,8 @@ use serde::Serialize;
 use std::sync::Arc;
 
 use crate::{
-    errors::FydeError, utils::ToF32, AddressList, GovernanceModuleContract, LiquidVaultContract,
-    RelayerContract, TaxModuleContract, ERC20,
+    errors::FydeError, utils::ToF32, AddressList, Chain, GovernanceModuleContract,
+    LiquidVaultContract, RelayerContract, TaxModuleContract, ERC20,
 };
 
 pub struct Asset {
@@ -68,7 +68,9 @@ pub trait AssetTrait {
 }
 
 impl Asset {
-    pub fn new(address: Address, provider: Arc<Provider<Http>>, address_list: AddressList) -> Self {
+    pub fn new(address: Address, provider: Arc<Provider<Http>>, chain: Chain) -> Self {
+        let address_list: AddressList = AddressList::new(&chain);
+
         Self {
             asset_address: address.clone(),
             contract: ERC20::new(address, provider.clone()),

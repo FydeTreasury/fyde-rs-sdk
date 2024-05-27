@@ -1,4 +1,6 @@
-use crate::{errors::FydeError, AddressList, GovernanceModuleContract, LiquidVaultContract, ERC20};
+use crate::{
+    errors::FydeError, AddressList, Chain, GovernanceModuleContract, LiquidVaultContract, ERC20,
+};
 use ethers::{
     contract::Multicall,
     providers::{Http, Provider},
@@ -24,11 +26,8 @@ pub struct GovernanceData {
 }
 
 impl User {
-    pub async fn new(
-        provider: Arc<Provider<Http>>,
-        address_list: AddressList,
-        user_address: Address,
-    ) -> Self {
+    pub async fn new(provider: Arc<Provider<Http>>, chain: Chain, user_address: Address) -> Self {
+        let address_list: AddressList = AddressList::new(&chain);
         Self {
             address: user_address,
             provider: provider.clone(),
