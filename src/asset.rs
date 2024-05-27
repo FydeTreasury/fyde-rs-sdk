@@ -42,6 +42,17 @@ pub enum WeightStatus {
     Undertemined,
 }
 
+impl std::fmt::Display for WeightStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            WeightStatus::Overweight => write!(f, "Overweight"),
+            WeightStatus::Underweight => write!(f, "Underweight"),
+            WeightStatus::InRange => write!(f, "InRange"),
+            WeightStatus::Undertemined => write!(f, "Undetermined"),
+        }
+    }
+}
+
 // We make trait here in case we want to implement trait for Vec<Asset> in the future
 #[async_trait]
 pub trait AssetTrait {
