@@ -20,21 +20,21 @@ pub struct Asset {
     relayer: RelayerContract<Provider<Http>>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AssetAccounting {
     pub token_in_protocol: f32,
     pub token_in_standard_pool: f32,
     pub token_in_governance_pool: f32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct TargetConcentrations {
     pub target_concentration_deposit: f32,
     pub target_concentration_withdraw: f32,
     pub target_concentration_fyde: f32,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub enum WeightStatus {
     Overweight,
     Underweight,
