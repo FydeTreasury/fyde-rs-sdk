@@ -12,25 +12,24 @@ use crate::{
     RelayerContract, RelayerContractEvents,
 };
 
-pub struct Action {
+pub struct ProtocolHistory {
     client: Arc<Provider<Http>>,
     liquid_vault: LiquidVaultContract<Provider<Http>>,
     relayer: RelayerContract<Provider<Http>>,
 }
 
 #[derive(Debug)]
-pub struct RequestData {
-    pub tx_hash: H256,
-    pub block_number: u32,
-    pub timestamp: u64,
-    pub request_id: u32,
-    pub requestor: Address,
-    pub asset_in: Vec<Address>,
-    pub asset_out: Vec<Address>,
-    pub amount_in: Vec<U256>,
-    pub amount_out: Vec<U256>,
-    pub keep_gov_rights: bool,
-    pub slippage_checker: U256,
+struct RequestData {
+    tx_hash: H256,
+    block_number: u32,
+    timestamp: u64,
+    request_id: u32,
+    requestor: Address,
+    asset_in: Vec<Address>,
+    asset_out: Vec<Address>,
+    amount_in: Vec<U256>,
+    amount_out: Vec<U256>,
+    keep_gov_rights: bool,
 }
 
 struct MetaFromBlock {
@@ -53,7 +52,6 @@ impl From<(crate::relayer_contract::DepositFilter, MetaFromBlock)> for RequestDa
             amount_in: event.0.request.amount_in,
             amount_out: event.0.request.amount_out,
             keep_gov_rights: event.0.request.keep_gov_rights,
-            slippage_checker: event.0.request.slippage_checker,
         }
     }
 }
@@ -71,7 +69,6 @@ impl From<(crate::relayer_contract::WithdrawFilter, MetaFromBlock)> for RequestD
             amount_in: event.0.request.amount_in,
             amount_out: event.0.request.amount_out,
             keep_gov_rights: event.0.request.keep_gov_rights,
-            slippage_checker: event.0.request.slippage_checker,
         }
     }
 }
@@ -89,7 +86,6 @@ impl From<(crate::relayer_contract::SwapFilter, MetaFromBlock)> for RequestData 
             amount_in: event.0.request.amount_in,
             amount_out: event.0.request.amount_out,
             keep_gov_rights: event.0.request.keep_gov_rights,
-            slippage_checker: event.0.request.slippage_checker,
         }
     }
 }
@@ -196,7 +192,7 @@ impl From<(RequestData, crate::liquid_vault_contract::SwapFilter)> for Swap {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum UserAction {
     Deposit {
         tx_hash: H256,
