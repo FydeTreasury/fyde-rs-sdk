@@ -1,6 +1,7 @@
 use ethers::prelude::abigen;
 use ethers::types::Address;
 
+pub mod action;
 pub mod asset;
 pub mod errors;
 pub mod governance;
