@@ -250,11 +250,16 @@ impl ProtocolHistory {
         }
     }
 
-    pub async fn get_data(&self, from_block: u64) -> Result<Vec<UserAction>, FydeError> {
+    pub async fn get_data(
+        &self,
+        from_block: u64,
+        to_block: u64,
+    ) -> Result<Vec<UserAction>, FydeError> {
         let events: Vec<(RelayerContractEvents, LogMeta)> = self
             .relayer
             .events()
             .from_block(from_block)
+            .to_block(to_block)
             .query_with_meta()
             .await?;
 
@@ -318,6 +323,7 @@ impl ProtocolHistory {
             .liquid_vault
             .events()
             .from_block(from_block)
+            .to_block(to_block)
             .query()
             .await?;
         let mut fyde_events = HashMap::new();
