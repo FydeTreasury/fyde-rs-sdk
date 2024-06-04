@@ -239,7 +239,7 @@ enum FydeEvents {
     Swap(crate::liquid_vault_contract::SwapFilter),
 }
 
-impl Action {
+impl ProtocolHistory {
     pub fn new(client: Arc<Provider<Http>>, chain: Chain) -> Self {
         let address_list: AddressList = AddressList::new(&chain);
 
