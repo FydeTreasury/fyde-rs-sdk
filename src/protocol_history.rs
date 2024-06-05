@@ -252,9 +252,21 @@ impl ProtocolHistory {
 
     pub async fn get_data(
         &self,
-        from_block: u64,
-        to_block: u64,
+        from_block: Option<u64>,
+        to_block: Option<u64>,
     ) -> Result<Vec<UserAction>, FydeError> {
+        let mut event_query = self.relayer.events();
+
+        if let Some(from) = from_block {
+            event_query = event_query.from_block(from);
+        }
+
+        if let Some(to) = to_block {
+            event_query = event_query.to_block(to);
+        }
+
+        let events: Vec<(RelayerContractEvents, LogMeta)> = event_query.query_with_meta().await?;
+        /*
         let events: Vec<(RelayerContractEvents, LogMeta)> = self
             .relayer
             .events()
@@ -262,6 +274,7 @@ impl ProtocolHistory {
             .to_block(to_block)
             .query_with_meta()
             .await?;
+        */
 
         let mut requests_data = vec![];
 
@@ -319,13 +332,15 @@ impl ProtocolHistory {
             }
         }
 
-        let events = self
-            .liquid_vault
-            .events()
-            .from_block(from_block)
-            .to_block(to_block)
-            .query()
-            .await?;
+        let mut event_query = self.liquid_vault.events();
+        if let Some(from) = from_block {
+            event_query = event_query.from_block(from);
+        }
+        if let Some(to) = to_block {
+            event_query = event_query.to_block(to);
+        }
+        let events = event_query.query().await?;
+
         let mut fyde_events = HashMap::new();
         for event in events {
             match event {
