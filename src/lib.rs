@@ -8,6 +8,7 @@ pub mod liquid_vault;
 pub mod protocol_history;
 pub mod user;
 pub mod utils;
+pub mod ve_fyde;
 
 abigen!(LiquidVaultContract, "./src/abis/LiquidVault.json");
 abigen!(TaxModuleContract, "./src/abis/TaxModule.json");
@@ -15,6 +16,11 @@ abigen!(GovernanceModuleContract, "./src/abis/GovernanceModule.json");
 abigen!(OracleModuleContract, "./src/abis/OracleModule.json");
 abigen!(RelayerContract, "./src/abis/RelayerV2.json");
 abigen!(StakingTRSY, "./src/abis/stakingTRSY.json");
+abigen!(
+    RevenueVeFydeDistributorContract,
+    "./src/abis/RevenueVeFydeDistributor.json"
+);
+abigen!(VoteEscrowContract, "./src/abis/VoteEscrow.json");
 
 abigen!(
     ERC20,
@@ -38,6 +44,9 @@ pub struct AddressList {
     pub staking_lrt: Address,
     pub lrt_reward_distribution: Address,
     pub weth: Address,
+    pub fyde_token: Address,
+    pub vote_escrow: Address,
+    pub revenue_vefyde_distributor: Address,
 }
 
 #[derive(Debug, Clone)]
@@ -95,6 +104,15 @@ impl AddressList {
             weth: String::from("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
                 .parse()
                 .expect("Failed to parse TaxModule address"),
+            fyde_token: String::from("0xBF2Dbb0f7C90bAC051dA1E6eF9a836b675B83c02")
+                .parse()
+                .expect("Failed to parse FydeToken address"),
+            vote_escrow: String::from("0x2A26D7f71A0dBB600A317160e42632408D0EE6eb")
+                .parse()
+                .expect("Failed to parse VoteEscrow address"),
+            revenue_vefyde_distributor: String::from("0x27b70B78E5a5Bf42E6893fBdbACD048852E87077")
+                .parse()
+                .expect("Failed to parse RevenueVeFydeDistributor address"),
         }
     }
 
@@ -127,6 +145,15 @@ impl AddressList {
             weth: String::from("0xAEB122a5Ed6cA3Cab6C42d6867AfbFe582db8761")
                 .parse()
                 .expect("Failed to parse TaxModule address"),
+            fyde_token: String::from("0xBF2Dbb0f7C90bAC051dA1E6eF9a836b675B83c02")
+                .parse()
+                .expect("Failed to parse FydeToken address"),
+            vote_escrow: String::from("0x2A26D7f71A0dBB600A317160e42632408D0EE6eb")
+                .parse()
+                .expect("Failed to parse VoteEscrow address"),
+            revenue_vefyde_distributor: String::from("0x27b70B78E5a5Bf42E6893fBdbACD048852E87077")
+                .parse()
+                .expect("Failed to parse RevenueVeFydeDistributor address"),
         }
     }
 }
