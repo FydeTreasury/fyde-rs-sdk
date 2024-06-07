@@ -3,14 +3,13 @@ use crate::{
 };
 use ethers::{
     contract::Multicall,
-    providers::{Http, Middleware, Provider},
+    providers::{Http, Provider},
     types::{Address, U256},
 };
 use serde::Serialize;
 use std::{sync::Arc, vec};
 
 pub struct VeFyde {
-    client: Arc<Provider<Http>>,
     vote_escrow: VoteEscrowContract<Provider<Http>>,
     multicall: Multicall<Provider<Http>>,
 }
@@ -74,7 +73,6 @@ impl VeFyde {
             .await
             .expect("Failed to create Multicall");
         Self {
-            client: provider.clone(),
             vote_escrow,
             multicall,
         }
@@ -123,14 +121,14 @@ impl VeFyde {
             return Ok(VeFydeUser::default());
         }
 
-        let last_locking_date = self.get_last_locking_ts(user).await?;
-        let lock_duration = expiry as u64 - last_locking_date;
-
         let checkpoint: Checkpoint = self
             .vote_escrow
             .get_user_history_at(user, history_length - 1)
             .call()
             .await?;
+
+        let last_locking_date = checkpoint.timestamp as u64;
+        let lock_duration = expiry as u64 - last_locking_date;
 
         let ve_balance_chart = if draw_vefyde_chart {
             Some(VeBalanceChart::get_decay_graph(
@@ -153,30 +151,6 @@ impl VeFyde {
         };
 
         Ok(ve_fyde_user)
-    }
-
-    async fn get_last_locking_ts(&self, user: Address) -> Result<u64, FydeError> {
-        let events = self
-            .vote_escrow
-            .events()
-            .from_block(0)
-            .query_with_meta()
-            .await?;
-
-        let mut timestamps: Vec<u64> = vec![];
-        for event in events {
-            match event {
-                (VoteEscrowContractEvents::UpdateLockFilter(ev), meta) => {
-                    if ev.user == user {
-                        let block = self.client.get_block(meta.block_number).await?;
-                        timestamps.push(block.unwrap().timestamp.as_u64());
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        Ok(*timestamps.iter().max().unwrap())
     }
 }
 
