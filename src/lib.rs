@@ -31,6 +31,7 @@ abigen!(
         function allowance(address,address) external view returns (uint256)
         ]"#,
 );
+abigen!(Strsy, "./src/abis/Strsy.json");
 
 #[derive(Debug, Clone)]
 // List of useful address for the Fyde protocol
@@ -46,7 +47,8 @@ pub struct AddressList {
     pub weth: Address,
     pub fyde_token: Address,
     pub vote_escrow: Address,
-    pub revenue_vefyde_distributor: Address,
+    pub vefyde_fee_distributor: Address,
+    pub strsy: Address,
 }
 
 #[derive(Debug, Clone)]
@@ -104,15 +106,18 @@ impl AddressList {
             weth: String::from("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
                 .parse()
                 .expect("Failed to parse TaxModule address"),
-            fyde_token: String::from("0xBF2Dbb0f7C90bAC051dA1E6eF9a836b675B83c02")
+            fyde_token: String::from("0xdDE736837C7c275A952a52eE11FAce88adde6711")
                 .parse()
                 .expect("Failed to parse FydeToken address"),
-            vote_escrow: String::from("0x2A26D7f71A0dBB600A317160e42632408D0EE6eb")
+            vote_escrow: String::from("0x9B369202ff147B54eA7092BC94425C781094DbdE")
                 .parse()
                 .expect("Failed to parse VoteEscrow address"),
-            revenue_vefyde_distributor: String::from("0x27b70B78E5a5Bf42E6893fBdbACD048852E87077")
+            vefyde_fee_distributor: String::from("0x41B911286E63c508345bA581d75928ecE4A0f543")
                 .parse()
                 .expect("Failed to parse RevenueVeFydeDistributor address"),
+            strsy: String::from("0xE11DF8c0E9B5697bd31515D0Fc5f4C9BD71566B9")
+                .parse()
+                .expect("Failed to parse sTRSY address"),
         }
     }
 
@@ -151,9 +156,12 @@ impl AddressList {
             vote_escrow: String::from("0x2A26D7f71A0dBB600A317160e42632408D0EE6eb")
                 .parse()
                 .expect("Failed to parse VoteEscrow address"),
-            revenue_vefyde_distributor: String::from("0x27b70B78E5a5Bf42E6893fBdbACD048852E87077")
+            vefyde_fee_distributor: String::from("0x27b70B78E5a5Bf42E6893fBdbACD048852E87077")
                 .parse()
                 .expect("Failed to parse RevenueVeFydeDistributor address"),
+            strsy: String::from("0xf81203D4da69823609ca74DEd222ce76027a81CB")
+                .parse()
+                .expect("Failed to parse sTRSY address"),
         }
     }
 }
