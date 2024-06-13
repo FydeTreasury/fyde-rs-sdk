@@ -397,10 +397,13 @@ impl ProtocolHistory {
     }
 }
 
+#[derive(Debug, Serialize, Clone)]
 pub enum StakingUnstaking {
     Staking(Staking),
     Unstaking(Unstaking),
 }
+#[derive(Debug, Serialize, Clone)]
+
 pub struct Staking {
     /// Person who called the function
     pub caller: Address,
@@ -415,6 +418,8 @@ pub struct Staking {
     /// Timestamp
     pub timestamp: u64,
 }
+
+#[derive(Debug, Serialize, Clone)]
 
 pub struct Unstaking {
     /// Person who called the function
