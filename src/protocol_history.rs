@@ -442,7 +442,7 @@ impl ProtocolHistory {
     pub async fn get_staking_unstaking_history(&self) -> Result<Vec<StakingUnstaking>, FydeError> {
         let mut staking_unstaking = vec![];
 
-        let events = self.strsy.events().query_with_meta().await?;
+        let events = self.strsy.events().from_block(0).query_with_meta().await?;
         for event in events {
             match event {
                 (StrsyEvents::DepositFilter(ev), meta) => {
