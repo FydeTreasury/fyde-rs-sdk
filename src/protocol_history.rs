@@ -399,43 +399,23 @@ impl ProtocolHistory {
 
 #[derive(Debug, Serialize, Clone)]
 pub enum StakingUnstaking {
-    Staking(Staking),
-    Unstaking(Unstaking),
-}
-#[derive(Debug, Serialize, Clone)]
-
-pub struct Staking {
-    /// Person who called the function
-    pub caller: Address,
-    /// Person who received the sTRSY
-    pub receiver: Address,
-    /// Number of TRSY staked
-    pub assets: U256,
-    /// Number of sTRSY received
-    pub shares: U256,
-    /// Block number
-    pub block_number: u64,
-    /// Timestamp
-    pub timestamp: u64,
-}
-
-#[derive(Debug, Serialize, Clone)]
-
-pub struct Unstaking {
-    /// Person who called the function
-    pub caller: Address,
-    /// Person who received the TRSY
-    pub receiver: Address,
-    /// Person who owned the sTRSY
-    pub owner: Address,
-    /// Number of TRSY withdrawn
-    pub assets: U256,
-    /// Number of sTRSY withdrawn
-    pub shares: U256,
-    /// Block number
-    pub block_number: u64,
-    /// Timestamp
-    pub timestamp: u64,
+    Staking {
+        caller: Address,
+        receiver: Address,
+        assets: U256,
+        shares: U256,
+        block_number: u64,
+        timestamp: u64,
+    },
+    Unstaking {
+        caller: Address,
+        receiver: Address,
+        owner: Address,
+        assets: U256,
+        shares: U256,
+        block_number: u64,
+        timestamp: u64,
+    },
 }
 
 impl ProtocolHistory {
@@ -453,7 +433,7 @@ impl ProtocolHistory {
                         .get_block(tx_data.block_number.unwrap())
                         .await?
                         .unwrap();
-                    let staking = Staking {
+                    let staking = StakingUnstaking::Staking {
                         caller: ev.caller,
                         receiver: ev.owner,
                         assets: ev.assets,
@@ -461,7 +441,7 @@ impl ProtocolHistory {
                         block_number: block.number.unwrap().as_u64(),
                         timestamp: block.timestamp.as_u64(),
                     };
-                    staking_unstaking.push(StakingUnstaking::Staking(staking));
+                    staking_unstaking.push(staking);
                 }
                 (StrsyEvents::WithdrawFilter(ev), meta) => {
                     let tx = meta.transaction_hash;
@@ -471,7 +451,7 @@ impl ProtocolHistory {
                         .get_block(tx_data.block_number.unwrap())
                         .await?
                         .unwrap();
-                    let unstaking = Unstaking {
+                    let unstaking = StakingUnstaking::Unstaking {
                         caller: ev.caller,
                         receiver: ev.receiver,
                         owner: ev.owner,
@@ -480,7 +460,7 @@ impl ProtocolHistory {
                         block_number: block.number.unwrap().as_u64(),
                         timestamp: block.timestamp.as_u64(),
                     };
-                    staking_unstaking.push(StakingUnstaking::Unstaking(unstaking));
+                    staking_unstaking.push(unstaking);
                 }
                 _ => {}
             }
