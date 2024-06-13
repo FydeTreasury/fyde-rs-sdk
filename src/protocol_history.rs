@@ -9,13 +9,14 @@ use serde::Serialize;
 
 use crate::{
     errors::FydeError, AddressList, Chain, LiquidVaultContract, LiquidVaultContractEvents,
-    RelayerContract, RelayerContractEvents,
+    RelayerContract, RelayerContractEvents, Strsy, StrsyEvents,
 };
 
 pub struct ProtocolHistory {
     client: Arc<Provider<Http>>,
     liquid_vault: LiquidVaultContract<Provider<Http>>,
     relayer: RelayerContract<Provider<Http>>,
+    strsy: Strsy<Provider<Http>>,
 }
 
 #[derive(Debug)]
@@ -246,7 +247,8 @@ impl ProtocolHistory {
         Self {
             client: client.clone(),
             liquid_vault: LiquidVaultContract::new(address_list.liquid_vault, client.clone()),
-            relayer: RelayerContract::new(address_list.relayer, client),
+            relayer: RelayerContract::new(address_list.relayer, client.clone()),
+            strsy: Strsy::new(address_list.strsy, client.clone()),
         }
     }
 
@@ -266,15 +268,6 @@ impl ProtocolHistory {
         }
 
         let events: Vec<(RelayerContractEvents, LogMeta)> = event_query.query_with_meta().await?;
-        /*
-        let events: Vec<(RelayerContractEvents, LogMeta)> = self
-            .relayer
-            .events()
-            .from_block(from_block)
-            .to_block(to_block)
-            .query_with_meta()
-            .await?;
-        */
 
         let mut requests_data = vec![];
 
@@ -401,5 +394,93 @@ impl ProtocolHistory {
         }
 
         Ok(user_actions)
+    }
+}
+
+pub enum StakingUnstaking {
+    Staking(Staking),
+    Unstaking(Unstaking),
+}
+pub struct Staking {
+    /// Person who called the function
+    pub caller: Address,
+    /// Person who received the sTRSY
+    pub receiver: Address,
+    /// Number of TRSY staked
+    pub assets: U256,
+    /// Number of sTRSY received
+    pub shares: U256,
+    /// Block number
+    pub block_number: u64,
+    /// Timestamp
+    pub timestamp: u64,
+}
+
+pub struct Unstaking {
+    /// Person who called the function
+    pub caller: Address,
+    /// Person who received the TRSY
+    pub receiver: Address,
+    /// Person who owned the sTRSY
+    pub owner: Address,
+    /// Number of TRSY withdrawn
+    pub assets: U256,
+    /// Number of sTRSY withdrawn
+    pub shares: U256,
+    /// Block number
+    pub block_number: u64,
+    /// Timestamp
+    pub timestamp: u64,
+}
+
+impl ProtocolHistory {
+    pub async fn get_staking_unstaking_history(&self) -> Result<Vec<StakingUnstaking>, FydeError> {
+        let mut staking_unstaking = vec![];
+
+        let events = self.strsy.events().query_with_meta().await?;
+        for event in events {
+            match event {
+                (StrsyEvents::DepositFilter(ev), meta) => {
+                    let tx = meta.transaction_hash;
+                    let tx_data = self.client.get_transaction(tx).await?.unwrap();
+                    let block = self
+                        .client
+                        .get_block(tx_data.block_number.unwrap())
+                        .await?
+                        .unwrap();
+                    let staking = Staking {
+                        caller: ev.caller,
+                        receiver: ev.owner,
+                        assets: ev.assets,
+                        shares: ev.shares,
+                        block_number: block.number.unwrap().as_u64(),
+                        timestamp: block.timestamp.as_u64(),
+                    };
+                    staking_unstaking.push(StakingUnstaking::Staking(staking));
+                }
+                (StrsyEvents::WithdrawFilter(ev), meta) => {
+                    let tx = meta.transaction_hash;
+                    let tx_data = self.client.get_transaction(tx).await?.unwrap();
+                    let block = self
+                        .client
+                        .get_block(tx_data.block_number.unwrap())
+                        .await?
+                        .unwrap();
+                    let unstaking = Unstaking {
+                        caller: ev.caller,
+                        receiver: ev.receiver,
+                        owner: ev.owner,
+                        assets: ev.assets,
+                        shares: ev.shares,
+                        block_number: block.number.unwrap().as_u64(),
+                        timestamp: block.timestamp.as_u64(),
+                    };
+                    staking_unstaking.push(StakingUnstaking::Unstaking(unstaking));
+                }
+                _ => {}
+            }
+        }
+
+        Ok(staking_unstaking)
     }
 }
