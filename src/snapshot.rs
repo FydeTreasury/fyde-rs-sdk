@@ -56,18 +56,18 @@ struct VotesResponse {
     votes: Vec<Vote>,
 }
 
-struct Snapshot {
+pub struct Snapshot {
   client: Client,
 }
 
 impl Snapshot {
-  fn new() -> Self {
+  pub fn new() -> Self {
       Self {
           client: Client::new(),
       }
   }
 
-  async fn fetch_latest_proposal(&self) -> Result<Proposal, Box<dyn std::error::Error>> {
+  pub async fn fetch_latest_proposal(&self) -> Result<Proposal, Box<dyn std::error::Error>> {
       let query = json!({
           "query": r#"
           {
@@ -119,7 +119,7 @@ impl Snapshot {
       Ok(proposal)
   }
 
-  async fn fetch_votes(&self, proposal_id: &str, num_votes: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
+  pub async fn fetch_votes(&self, proposal_id: &str, num_votes: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
       let query = json!({
           "query": format!(
               r#"
