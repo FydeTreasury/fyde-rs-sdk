@@ -8,6 +8,7 @@ pub mod liquid_vault;
 pub mod protocol_history;
 pub mod user;
 pub mod utils;
+pub mod snapshot;
 pub mod ve_fyde;
 
 abigen!(LiquidVaultContract, "./src/abis/LiquidVault.json");
