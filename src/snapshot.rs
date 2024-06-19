@@ -5,20 +5,20 @@ use tokio;
 use chrono::Utc;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Proposal {
-  id: String,
-  title: String,
-  body: String,
-  choices: Vec<String>,
-  start: u64,
-  end: u64,
-  snapshot: String,
-  state: String,
-  scores: Vec<f64>,
-  scores_total: f64,
-  scores_updated: u64,
-  author: String,
-  space: Space,
+pub struct Proposal {
+  pub id: String,
+  pub title: String,
+  pub body: String,
+  pub choices: Vec<String>,
+  pub start: u64,
+  pub end: u64,
+  pub snapshot: String,
+  pub state: String,
+  pub scores: Vec<f64>,
+  pub scores_total: f64,
+  pub scores_updated: u64,
+  pub author: String,
+  pub space: Space,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -33,15 +33,15 @@ struct ProposalsResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Vote {
-    id: String,
-    voter: String,
-    vp: f64,
-    vp_state: String,
-    created: u64,
-    proposal: VoteProposal,
-    choice: serde_json::Value,
-    space: Space,
+pub struct Vote {
+    pub id: String,
+    pub voter: String,
+    pub vp: f64,
+    pub vp_state: String,
+    pub created: u64,
+    pub proposal: VoteProposal,
+    pub choice: serde_json::Value,
+    pub space: Space,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
