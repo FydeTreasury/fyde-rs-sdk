@@ -9,18 +9,18 @@ struct AssetFields {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct Proposal {
-  id: String,
-  title: String,
-  body: String,
-  choices: Vec<String>,
-  start: u64,
-  end: u64,
-  snapshot: String,
-  state: String,
-  scores: Vec<f64>,
-  scores_total: f64,
-  scores_updated: u64,
+pub struct Proposal {
+  pub id: String,
+  pub title: String,
+  pub body: String,
+  pub choices: Vec<String>,
+  pub start: u64,
+  pub end: u64,
+  pub snapshot: String,
+  pub state: String,
+  pub scores: Vec<f64>,
+  pub scores_total: f64,
+  pub scores_updated: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -35,15 +35,15 @@ struct ProposalsVector {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Vote {
-    id: String,
-    voter: String,
-    vp: f64,
-    vp_state: String,
-    created: u64,
-    proposal: VoteProposal,
-    choice: serde_json::Value,
-    space: Space,
+pub struct Vote {
+    pub id: String,
+    pub voter: String,
+    pub vp: f64,
+    pub vp_state: String,
+    pub created: u64,
+    pub proposal: VoteProposal,
+    pub choice: serde_json::Value,
+    pub space: Space,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -69,18 +69,18 @@ struct ProposalsResponse {
     choices: Vec<String>,
 }
 
-struct Snapshot {
+pub struct Snapshot {
   client: Client,
 }
 
 impl Snapshot {
-  fn new() -> Self {
+  pub fn new() -> Self {
       Self {
           client: Client::new(),
       }
   }
 
-  async fn fetch_address(&self) -> Result<APIResponse, Box<dyn std::error::Error>> {
+  pub async fn fetch_address(&self) -> Result<APIResponse, Box<dyn std::error::Error>> {
     let url = "https://test.fyde.fi/api/assets";
 
     let response = self
@@ -101,7 +101,7 @@ impl Snapshot {
     })
     }
 
-    async fn fetch_latest_proposal(&self) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
+    pub async fn fetch_latest_proposal(&self) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
         println!("Fetching latest proposal...");
         let fyde_response = self.fetch_address().await?;
 
@@ -175,7 +175,7 @@ impl Snapshot {
         Ok(proposal_response)
     }
 
-  async fn fetch_votes(&self, proposal_id: &str, num_votes: usize, skip_index: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
+  pub async fn fetch_votes(&self, proposal_id: &str, num_votes: usize, skip_index: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
       let query = json!({
           "query": format!(
               r#"
