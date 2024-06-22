@@ -1,10 +1,14 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use tokio;
-use chrono::Utc;
 
 #[derive(Serialize, Deserialize, Debug)]
+struct AssetFields {
+    symbol: String,
+    address: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Proposal {
   pub id: String,
   pub title: String,
@@ -17,18 +21,16 @@ pub struct Proposal {
   pub scores: Vec<f64>,
   pub scores_total: f64,
   pub scores_updated: u64,
-  pub author: String,
-  pub space: Space,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct Space {
     id: String,
     name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ProposalsResponse {
+struct ProposalsVector {
     proposals: Vec<Proposal>,
 }
 
@@ -56,6 +58,17 @@ struct VotesResponse {
     votes: Vec<Vote>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct APIResponse {
+    symbol_mapping: std::collections::HashMap<String, String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ProposalsResponse {
+    proposals: Vec<Proposal>,
+    choices: Vec<String>,
+}
+
 pub struct Snapshot {
   client: Client,
 }
@@ -67,66 +80,109 @@ impl Snapshot {
       }
   }
 
-  pub async fn fetch_latest_proposal(&self) -> Result<Proposal, Box<dyn std::error::Error>> {
-      let query = json!({
-          "query": r#"
-          {
-              proposals(
-                  first: 1,
-                  skip: 0,
-                  where: {
-                      space_in: ["veFyde.eth"]
-                  },
-                  orderBy: "created",
-                  orderDirection: desc
-              ) {
-                  id
-                  title
-                  body
-                  choices
-                  start
-                  end
-                  snapshot
-                  state
-                  scores
-                  scores_total
-                  scores_updated
-                  author
-                  space {
-                      id
-                      name
-                  }
-              }
-          }
-          "#
-      });
+  pub async fn fetch_address(&self) -> Result<APIResponse, Box<dyn std::error::Error>> {
+    let url = "https://test.fyde.fi/api/assets";
 
-      let response = self
-          .client
-          .post("https://testnet.hub.snapshot.org/graphql")
-          .json(&query)
-          .send()
-          .await?
-          .json::<serde_json::Value>()
-          .await?;
+    let response = self
+        .client
+        .get(url)
+        .send()
+        .await?
+        .json::<Vec<AssetFields>>().await?;
 
-      let proposal = serde_json::from_value::<ProposalsResponse>(response["data"].clone())?
+    let mut asset_map = std::collections::HashMap::new();
+
+    for asset in response {
+        asset_map.insert(asset.symbol, asset.address);
+    } 
+
+    Ok(APIResponse {
+        symbol_mapping: asset_map,
+    })
+    }
+
+    pub async fn fetch_latest_proposal(&self) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
+        println!("Fetching latest proposal...");
+        let fyde_response = self.fetch_address().await?;
+
+        let query = json!({
+            "query": r#"
+            {
+                proposals(
+                    first: 1,
+                    skip: 0,
+                    where: {
+                        space_in: ["veFyde.eth"],
+                        state: "closed"
+                    },
+                    orderBy: "created",
+                    orderDirection: desc
+                ) {
+                    id
+                    title
+                    body
+                    choices
+                    start
+                    end
+                    snapshot
+                    state
+                    scores
+                    scores_total
+                    scores_updated
+                    author
+                    space {
+                        id
+                        name
+                    }
+                }
+            }
+            "#
+        });
+
+    let response = self
+        .client
+        .post("https://testnet.hub.snapshot.org/graphql")
+        .json(&query)
+        .send()
+        .await?
+        .json::<serde_json::Value>()
+        .await?;
+
+      let proposal = serde_json::from_value::<ProposalsVector>(response["data"].clone())?
           .proposals
           .into_iter()
           .next()
           .ok_or("No proposals found")?;
-      
-      Ok(proposal)
-  }
 
-  pub async fn fetch_votes(&self, proposal_id: &str, num_votes: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
+      let temp_proposal = proposal.clone();
+      let mut choices = Vec::new();
+
+      for choice in temp_proposal.choices {
+            choices.push(choice.clone());
+       }
+
+        let mut choices_address = Vec::new();
+        for choice in choices {
+            let address = fyde_response.symbol_mapping.get(&choice).unwrap();
+            choices_address.push(address.clone());
+        }
+
+        let proposal_response = ProposalsResponse {
+            proposals: vec![proposal],
+            choices: choices_address,
+        };
+
+        Ok(proposal_response)
+    }
+
+  pub async fn fetch_votes(&self, proposal_id: &str, num_votes: usize, skip_index: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
       let query = json!({
           "query": format!(
               r#"
               {{
                   votes(
                       first: {},
-                      skip: 0,
+                      skip: {},
                       where: {{
                           proposal: "{}"
                       }}
@@ -150,6 +206,7 @@ impl Snapshot {
               }}
               "#,
               num_votes,
+              skip_index,
               proposal_id
           )
       });
