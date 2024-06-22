@@ -64,9 +64,9 @@ struct APIResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ProposalsResponse {
-    proposals: Vec<Proposal>,
-    choices: Vec<String>,
+pub struct ProposalsResponse {
+    pub proposals: Vec<Proposal>,
+    pub choices: Vec<String>,
 }
 
 pub struct Snapshot {
