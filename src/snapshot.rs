@@ -101,16 +101,16 @@ impl Snapshot {
     })
     }
 
-    pub async fn fetch_latest_proposal(&self) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
+    pub async fn fetch_latest_proposal(&self, skip_index: usize) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
         println!("Fetching latest proposal...");
         let fyde_response = self.fetch_address().await?;
 
         let query = json!({
-            "query": r#"
+            "query": fomrat!(r#"
             {
                 proposals(
                     first: 1,
-                    skip: 0,
+                    skip: {},
                     where: {
                         space_in: ["veFyde.eth"],
                         state: "closed"
@@ -136,7 +136,9 @@ impl Snapshot {
                     }
                 }
             }
-            "#
+            "#,
+             skip_index
+            )
         });
 
     let response = self
