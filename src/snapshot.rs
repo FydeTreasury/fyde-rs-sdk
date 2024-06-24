@@ -111,13 +111,13 @@ impl Snapshot {
                 proposals(
                     first: 1,
                     skip: {},
-                    where: {
+                    where: {{
                         space_in: ["veFyde.eth"],
                         state: "closed"
-                    },
+                    }},
                     orderBy: "created",
                     orderDirection: desc
-                ) {
+                ) {{
                     id
                     title
                     body
@@ -130,11 +130,11 @@ impl Snapshot {
                     scores_total
                     scores_updated
                     author
-                    space {
+                    space {{
                         id
                         name
-                    }
-                }
+                    }}
+                }}
             }}
             "#,
             skip_index
