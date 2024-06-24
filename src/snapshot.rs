@@ -107,7 +107,7 @@ impl Snapshot {
 
         let query = json!({
             "query": format!(r#"
-            {
+            {{
                 proposals(
                     first: 1,
                     skip: {},
@@ -135,9 +135,9 @@ impl Snapshot {
                         name
                     }
                 }
-            }
+            }}
             "#,
-             skip_index
+            skip_index
             )
         });
 
