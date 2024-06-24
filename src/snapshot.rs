@@ -106,7 +106,7 @@ impl Snapshot {
         let fyde_response = self.fetch_address().await?;
 
         let query = json!({
-            "query": fomrat!(r#"
+            "query": format!(r#"
             {
                 proposals(
                     first: 1,
