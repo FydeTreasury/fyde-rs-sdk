@@ -112,7 +112,7 @@ impl Snapshot {
                     first: 1,
                     skip: {},
                     where: {{
-                        space_in: ["veFyde.eth"],
+                        space_in: ["vefyde.eth"],
                         state: "closed"
                     }},
                     orderBy: "created",
