@@ -149,7 +149,7 @@ impl Snapshot {
                     first: 1,
                     skip: {},
                     where: {{
-                        space_in: ["{}"],
+                        space_in: {},
                         state: "closed"
                     }},
                     orderBy: "created",
