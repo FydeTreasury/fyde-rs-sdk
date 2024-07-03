@@ -149,7 +149,7 @@ impl Snapshot {
                     first: 1,
                     skip: {},
                     where: {{
-                        space_in: {},
+                        space_in: ["{}"],
                         state: "closed"
                     }},
                     orderBy: "created",
@@ -268,5 +268,17 @@ impl Snapshot {
         let votes = serde_json::from_value::<VotesResponse>(response["data"].clone())?.votes;
 
         Ok(votes)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_fetch_latest_proposal() {
+        let snapshot = Snapshot::new(Chain::Sepolia);
+        let proposal = snapshot.fetch_latest_proposal(0).await.unwrap();
+        println!("{:?}", proposal);
     }
 }
