@@ -2,6 +2,8 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
+use crate::Chain;
+
 #[derive(Serialize, Deserialize, Debug)]
 struct AssetFields {
     symbol: String,
@@ -10,28 +12,28 @@ struct AssetFields {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Proposal {
-  pub id: String,
-  pub title: String,
-  pub body: String,
-  pub choices: Vec<String>,
-  pub start: u64,
-  pub end: u64,
-  pub snapshot: String,
-  pub state: String,
-  pub scores: Vec<f64>,
-  pub scores_total: f64,
-  pub scores_updated: u64,
+    pub id: String,
+    pub title: String,
+    pub body: String,
+    pub choices: Vec<String>,
+    pub start: u64,
+    pub end: u64,
+    pub snapshot: String,
+    pub state: String,
+    pub scores: Vec<f64>,
+    pub scores_total: f64,
+    pub scores_updated: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct Space {
-    id: String,
-    name: String,
+pub struct Space {
+    pub id: String,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ProposalsVector {
-    proposals: Vec<Proposal>,
+pub struct ProposalsVector {
+    pub proposals: Vec<Proposal>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -47,20 +49,20 @@ pub struct Vote {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct VoteProposal {
-    id: String,
-    choices: Vec<String>,
-    scores_total: f64,
+pub struct VoteProposal {
+    pub id: String,
+    pub choices: Vec<String>,
+    pub scores_total: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct VotesResponse {
-    votes: Vec<Vote>,
+pub struct VotesResponse {
+    pub votes: Vec<Vote>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct APIResponse {
-    symbol_mapping: std::collections::HashMap<String, String>,
+pub struct APIResponse {
+    pub symbol_mapping: std::collections::HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -70,38 +72,73 @@ pub struct ProposalsResponse {
 }
 
 pub struct Snapshot {
-  client: Client,
+    client: Client,
+    snapshot_url: SnapshotUrl,
+}
+
+struct SnapshotUrl {
+    asset_endpoint: String,
+    snapshot_graphql: String,
+    space_name: String,
+}
+
+impl SnapshotUrl {
+    pub fn new(chain: Chain) -> Self {
+        let asset_endpoint = match chain {
+            Chain::Mainnet => "https://api.fyde.fi/api/assets",
+            Chain::Sepolia => "https://test.fyde.fi/api/assets",
+        };
+
+        let snapshot_graphql = match chain {
+            Chain::Mainnet => "https://hub.snapshot.org/graphql",
+            Chain::Sepolia => "https://testnet.hub.snapshot.org/graphql",
+        };
+
+        let space_name = match chain {
+            Chain::Mainnet => "vefyde.eth",
+            Chain::Sepolia => "vefyde.eth",
+        };
+
+        Self {
+            asset_endpoint: asset_endpoint.to_string(),
+            snapshot_graphql: snapshot_graphql.to_string(),
+            space_name: space_name.to_string(),
+        }
+    }
 }
 
 impl Snapshot {
-  pub fn new() -> Self {
-      Self {
-          client: Client::new(),
-      }
-  }
-
-  pub async fn fetch_address(&self) -> Result<APIResponse, Box<dyn std::error::Error>> {
-    let url = "https://test.fyde.fi/api/assets";
-
-    let response = self
-        .client
-        .get(url)
-        .send()
-        .await?
-        .json::<Vec<AssetFields>>().await?;
-
-    let mut asset_map = std::collections::HashMap::new();
-
-    for asset in response {
-        asset_map.insert(asset.symbol, asset.address);
-    } 
-
-    Ok(APIResponse {
-        symbol_mapping: asset_map,
-    })
+    pub fn new(chain: Chain) -> Self {
+        Self {
+            client: Client::new(),
+            snapshot_url: SnapshotUrl::new(chain),
+        }
     }
 
-    pub async fn fetch_latest_proposal(&self, skip_index: usize) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
+    pub async fn fetch_address(&self) -> Result<APIResponse, Box<dyn std::error::Error>> {
+        let response = self
+            .client
+            .get(&self.snapshot_url.asset_endpoint)
+            .send()
+            .await?
+            .json::<Vec<AssetFields>>()
+            .await?;
+
+        let mut asset_map = std::collections::HashMap::new();
+
+        for asset in response {
+            asset_map.insert(asset.symbol, asset.address);
+        }
+
+        Ok(APIResponse {
+            symbol_mapping: asset_map,
+        })
+    }
+
+    pub async fn fetch_latest_proposal(
+        &self,
+        skip_index: usize,
+    ) -> Result<ProposalsResponse, Box<dyn std::error::Error>> {
         println!("Fetching latest proposal...");
         let fyde_response = self.fetch_address().await?;
 
@@ -112,7 +149,7 @@ impl Snapshot {
                     first: 1,
                     skip: {},
                     where: {{
-                        space_in: ["vefyde.eth"],
+                        space_in: ["{}"],
                         state: "closed"
                     }},
                     orderBy: "created",
@@ -137,31 +174,32 @@ impl Snapshot {
                 }}
             }}
             "#,
-            skip_index
+                skip_index,
+                self.snapshot_url.space_name
             )
         });
 
-    let response = self
-        .client
-        .post("https://testnet.hub.snapshot.org/graphql")
-        .json(&query)
-        .send()
-        .await?
-        .json::<serde_json::Value>()
-        .await?;
+        let response = self
+            .client
+            .post(&self.snapshot_url.snapshot_graphql)
+            .json(&query)
+            .send()
+            .await?
+            .json::<serde_json::Value>()
+            .await?;
 
-      let proposal = serde_json::from_value::<ProposalsVector>(response["data"].clone())?
-          .proposals
-          .into_iter()
-          .next()
-          .ok_or("No proposals found")?;
+        let proposal = serde_json::from_value::<ProposalsVector>(response["data"].clone())?
+            .proposals
+            .into_iter()
+            .next()
+            .ok_or("No proposals found")?;
 
-      let temp_proposal = proposal.clone();
-      let mut choices = Vec::new();
+        let temp_proposal = proposal.clone();
+        let mut choices = Vec::new();
 
-      for choice in temp_proposal.choices {
+        for choice in temp_proposal.choices {
             choices.push(choice.clone());
-       }
+        }
 
         let mut choices_address = Vec::new();
         for choice in choices {
@@ -177,10 +215,15 @@ impl Snapshot {
         Ok(proposal_response)
     }
 
-  pub async fn fetch_votes(&self, proposal_id: &str, num_votes: usize, skip_index: usize) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
-      let query = json!({
-          "query": format!(
-              r#"
+    pub async fn fetch_votes(
+        &self,
+        proposal_id: &str,
+        num_votes: usize,
+        skip_index: usize,
+    ) -> Result<Vec<Vote>, Box<dyn std::error::Error>> {
+        let query = json!({
+            "query": format!(
+                r#"
               {{
                   votes(
                       first: {},
@@ -207,24 +250,23 @@ impl Snapshot {
                   }}
               }}
               "#,
-              num_votes,
-              skip_index,
-              proposal_id
-          )
-      });
+                num_votes,
+                skip_index,
+                proposal_id
+            )
+        });
 
-      let response = self
-          .client
-          .post("https://testnet.hub.snapshot.org/graphql")
-          .json(&query)
-          .send()
-          .await?
-          .json::<serde_json::Value>()
-          .await?;
+        let response = self
+            .client
+            .post(&self.snapshot_url.snapshot_graphql)
+            .json(&query)
+            .send()
+            .await?
+            .json::<serde_json::Value>()
+            .await?;
 
-      let votes = serde_json::from_value::<VotesResponse>(response["data"].clone())?.votes;
-      
-      Ok(votes)
-  }
+        let votes = serde_json::from_value::<VotesResponse>(response["data"].clone())?.votes;
+
+        Ok(votes)
+    }
 }
-
