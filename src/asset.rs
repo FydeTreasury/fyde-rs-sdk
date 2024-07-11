@@ -56,6 +56,7 @@ impl std::fmt::Display for WeightStatus {
 #[derive(Debug, Serialize, Clone)]
 pub struct UniswapInfo {
     pub uniswap_pool: Address,
+    pub decimals: u8
     pub quote_token: Address,
     pub quote_token_decimals: u8,
 }
@@ -152,10 +153,12 @@ impl AssetTrait for Asset {
             .await?;
 
         let uniswap_pool = asset_info.1;
+        let decimals = asset_info.3;
         let quote_token = asset_info.5;
         let quote_token_decimals = asset_info.4;
         Ok(UniswapInfo {
             uniswap_pool,
+            decimals,
             quote_token,
             quote_token_decimals,
         })
