@@ -53,6 +53,13 @@ impl std::fmt::Display for WeightStatus {
     }
 }
 
+#[derive(Debug, Serialize, Clone)]
+pub struct UniswapInfo {
+    pub uniswap_pool: Address,
+    pub quote_token: Address,
+    pub quote_token_decimals: u8,
+}
+
 // We make trait here in case we want to implement trait for Vec<Asset> in the future
 #[async_trait]
 pub trait AssetTrait {
@@ -61,7 +68,7 @@ pub trait AssetTrait {
     async fn get_address(&self) -> Result<Address, FydeError>;
     async fn get_asset_aum(&self) -> Result<f32, FydeError>;
     async fn get_oracle_price(&self, decimals: u8) -> Result<f32, FydeError>;
-    async fn get_uniswap_pool(&self) -> Result<Address, FydeError>;
+    async fn get_uniswap_info(&self) -> Result<UniswapInfo, FydeError>;
     async fn get_asset_accounting(&self, decimals: u8) -> Result<AssetAccounting, FydeError>;
     async fn get_asset_target_concentrations(&self) -> Result<TargetConcentrations, FydeError>;
     async fn get_current_concentration(&self, asset_aum: f32, tvl: f32) -> Result<f32, FydeError>;
@@ -137,7 +144,7 @@ impl AssetTrait for Asset {
         Ok(oracle_price.to_f32(decimals as f32))
     }
 
-    async fn get_uniswap_pool(&self) -> Result<Address, FydeError> {
+    async fn get_uniswap_info(&self) -> Result<UniswapInfo, FydeError> {
         let asset_info = self
             .liquid_vault
             .asset_info(self.asset_address)
@@ -145,7 +152,13 @@ impl AssetTrait for Asset {
             .await?;
 
         let uniswap_pool = asset_info.1;
-        Ok(uniswap_pool)
+        let quote_token = asset_info.5;
+        let quote_token_decimals = asset_info.4;
+        Ok(UniswapInfo {
+            uniswap_pool,
+            quote_token,
+            quote_token_decimals,
+        })
     }
 
     async fn get_asset_accounting(&self, decimals: u8) -> Result<AssetAccounting, FydeError> {
