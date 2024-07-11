@@ -142,7 +142,7 @@ impl AssetTrait for Asset {
             .get_quote(self.asset_address, amount)
             .call()
             .await?;
-        Ok(oracle_price.to_f32(decimals as f32))
+        Ok(oracle_price.to_f32(18.0))
     }
 
     async fn get_uniswap_info(&self) -> Result<UniswapInfo, FydeError> {
