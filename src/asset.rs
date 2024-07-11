@@ -56,7 +56,7 @@ impl std::fmt::Display for WeightStatus {
 #[derive(Debug, Serialize, Clone)]
 pub struct UniswapInfo {
     pub uniswap_pool: Address,
-    pub decimals: u8
+    pub decimals: u8,
     pub quote_token: Address,
     pub quote_token_decimals: u8,
 }
