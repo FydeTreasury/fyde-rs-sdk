@@ -61,6 +61,7 @@ pub trait AssetTrait {
     async fn get_address(&self) -> Result<Address, FydeError>;
     async fn get_asset_aum(&self) -> Result<f32, FydeError>;
     async fn get_oracle_price(&self, decimals: u8) -> Result<f32, FydeError>;
+    async fn get_uniswap_pool(&self) -> Result<Address, FydeError>;
     async fn get_asset_accounting(&self, decimals: u8) -> Result<AssetAccounting, FydeError>;
     async fn get_asset_target_concentrations(&self) -> Result<TargetConcentrations, FydeError>;
     async fn get_current_concentration(&self, asset_aum: f32, tvl: f32) -> Result<f32, FydeError>;
@@ -134,6 +135,17 @@ impl AssetTrait for Asset {
             .call()
             .await?;
         Ok(oracle_price.to_f32(decimals as f32))
+    }
+
+    async fn get_uniswap_pool(&self) -> Result<Address, FydeError> {
+        let asset_info = self
+            .liquid_vault
+            .asset_info(self.asset_address)
+            .call()
+            .await?;
+
+        let uniswap_pool = asset_info.1;
+        Ok(uniswap_pool)
     }
 
     async fn get_asset_accounting(&self, decimals: u8) -> Result<AssetAccounting, FydeError> {
