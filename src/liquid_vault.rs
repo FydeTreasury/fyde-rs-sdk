@@ -13,7 +13,6 @@ pub struct LiquidVault {
     contract: LiquidVaultContract<Provider<Http>>,
     staking_trsy: StakingTRSY<Provider<Http>>,
     multicall: Multicall<Provider<Http>>,
-    events: Vec<LiquidVaultContractEvents>,
     address: Address,
 }
 
@@ -25,18 +24,12 @@ impl LiquidVault {
         let multicall = Multicall::new(provider, None)
             .await
             .expect("Failed to create Multicall");
-        let events = contract
-            .events()
-            .from_block(0)
-            .query()
-            .await
-            .expect("Failed to get events");
+
         Self {
             contract,
             staking_trsy,
             multicall,
             address: address_list.liquid_vault,
-            events,
         }
     }
 
@@ -59,8 +52,16 @@ impl LiquidVault {
     }
 
     pub async fn get_total_fees(&self) -> Result<U256, FydeError> {
+        let events = self
+            .contract
+            .events()
+            .from_block(0)
+            .query()
+            .await
+            .expect("Failed to get events");
+
         let mut tax = U256::from(0);
-        for event in self.events.iter() {
+        for event in events.iter() {
             if let LiquidVaultContractEvents::TransferFilter(ev) = event {
                 if ev.from
                     == "0x0000000000000000000000000000000000000000"
@@ -76,9 +77,17 @@ impl LiquidVault {
     }
 
     pub async fn get_management_fees(&self) -> Result<U256, FydeError> {
+        let events = self
+            .contract
+            .events()
+            .from_block(0)
+            .query()
+            .await
+            .expect("Failed to get events");
+
         let mut fees = U256::from(0);
 
-        for event in self.events.iter() {
+        for event in events.iter() {
             if let LiquidVaultContractEvents::ManagementFeeCollectedFilter(ev) = event {
                 fees += ev.fee_to_mint;
             }
@@ -93,8 +102,15 @@ impl LiquidVault {
     }
 
     pub async fn get_burned_trsy_by_swap(&self) -> Result<U256, FydeError> {
+        let events = self
+            .contract
+            .events()
+            .from_block(0)
+            .query()
+            .await
+            .expect("Failed to get events");
         let mut burned = U256::from(0);
-        for event in self.events.iter() {
+        for event in events.iter() {
             if let LiquidVaultContractEvents::TransferFilter(ev) = event {
                 if ev.to
                     == "0x0000000000000000000000000000000000000000"
