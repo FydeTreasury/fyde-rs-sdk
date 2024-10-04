@@ -107,13 +107,13 @@ impl AddressList {
             weth: String::from("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
                 .parse()
                 .expect("Failed to parse TaxModule address"),
-            fyde_token: String::from("0xdDE736837C7c275A952a52eE11FAce88adde6711")
+            fyde_token: String::from("0x8a462E6a0051d006E33152FBEaDFB9A14198DE30")
                 .parse()
                 .expect("Failed to parse FydeToken address"),
-            vote_escrow: String::from("0x9B369202ff147B54eA7092BC94425C781094DbdE")
+            vote_escrow: String::from("0x6Fa0b27ba2f951A68fA7A097F6c6cCeCad93c9eD")
                 .parse()
                 .expect("Failed to parse VoteEscrow address"),
-            vefyde_fee_distributor: String::from("0x41B911286E63c508345bA581d75928ecE4A0f543")
+            vefyde_fee_distributor: String::from("0x3204074ad7555cF6149bc21441313611B6418045")
                 .parse()
                 .expect("Failed to parse RevenueVeFydeDistributor address"),
             strsy: String::from("0xE11DF8c0E9B5697bd31515D0Fc5f4C9BD71566B9")
