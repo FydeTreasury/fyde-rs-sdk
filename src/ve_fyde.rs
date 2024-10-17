@@ -122,7 +122,7 @@ impl VeFyde {
         let (fyde_locked, expiry) = results.1;
         let history_length = results.2;
 
-        if history_length == U256::zero() || ve_fyde_balance == 0 || expiry == 0 {
+        if history_length == U256::zero() || expiry == 0 {
             return Ok(VeFydeUser::default());
         }
 
