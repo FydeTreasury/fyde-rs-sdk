@@ -79,7 +79,12 @@ impl VeFyde {
     }
 
     pub async fn get_ve_fyde_holders_list(&self) -> Result<Vec<Address>, FydeError> {
-        let events = self.vote_escrow.events().from_block(0).query().await?;
+        let events = self
+            .vote_escrow
+            .events()
+            .from_block(20231776)
+            .query()
+            .await?;
 
         let mut holders: Vec<Address> = vec![];
         for event in events {
@@ -162,15 +167,16 @@ mod tests {
     async fn test_ve_fyde() -> Result<(), FydeError> {
         let provider = Arc::new(
             Provider::<Http>::try_from(
-                "https://eth-sepolia.g.alchemy.com/v2/9K_jrYrKqo_4w_rpJrmIQWzgV626lh7n",
+                "https://eth-mainnet.g.alchemy.com/v2/6scwdLmXmD0Ifv_8TgZaNA5Y7MzBhoZP",
             )
             .expect("Failed to create provider"),
         );
-        let chain = Chain::Sepolia;
+        let chain = Chain::Mainnet;
         let ve_fyde = VeFyde::new(provider.clone(), chain).await;
         let holders = ve_fyde.get_ve_fyde_holders_list().await?;
 
         for holder in holders {
+            println!("holder: {:?}", holder);
             let ve_fyde_user = ve_fyde.get_ve_fyde_data(holder, false).await?;
             println!("{:?}", ve_fyde_user);
         }
