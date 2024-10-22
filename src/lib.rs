@@ -6,9 +6,9 @@ pub mod errors;
 pub mod governance;
 pub mod liquid_vault;
 pub mod protocol_history;
+pub mod snapshot;
 pub mod user;
 pub mod utils;
-pub mod snapshot;
 pub mod ve_fyde;
 
 abigen!(LiquidVaultContract, "./src/abis/LiquidVault.json");
@@ -113,7 +113,7 @@ impl AddressList {
             vote_escrow: String::from("0x6Fa0b27ba2f951A68fA7A097F6c6cCeCad93c9eD")
                 .parse()
                 .expect("Failed to parse VoteEscrow address"),
-            vefyde_fee_distributor: String::from("0x3204074ad7555cF6149bc21441313611B6418045")
+            vefyde_fee_distributor: String::from("0x4E48B226B49797e50892bFB0FeAfb9C503Eb9687")
                 .parse()
                 .expect("Failed to parse RevenueVeFydeDistributor address"),
             strsy: String::from("0xE11DF8c0E9B5697bd31515D0Fc5f4C9BD71566B9")
